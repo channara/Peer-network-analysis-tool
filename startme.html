@@ -1,0 +1,903 @@
+<html>
+
+		<head>
+		<meta http-equiv="Cache-control" content="no-cache">
+		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+
+		<script src="scripts/cytoscape.min.js"></script>
+		<!--<script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>-->
+		
+		<script src="scripts/cloudflare.com/ajax/libs/xlsx/0.13.5/xlsx.full.min.js"></script>
+		<script src="scripts/jquery-3.4.1.js"></script>
+		
+		<!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>-->
+                <script src="scripts/bootstrap.min.js"></script>
+		<!--<script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>-->
+		<!--<script src="https://unpkg.com/dagre@0.7.4/dist/dagre.js"></script>
+		<script src="scripts/cytoscape-dagre.js"></script>-->
+		<script src="scripts/cytoscape-panzoom.js"></script>
+		<!--<script src="scripts/cytoscape-automove.js"></script>-->
+		
+		<!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">-->
+                <link rel="stylesheet" href="css/bootstrap.min.css">
+		<link href="css/cytoscape.js-panzoom.css" rel="stylesheet" type="text/css" />
+		<link href="css/font-awesome-4.0.3/css/font-awesome.css" rel="stylesheet" type="text/css" />
+		
+		<!--<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">-->
+		
+		<script src="scripts/d3-dispatch.v1.min.js"></script>
+		<script src="scripts/d3-quadtree.v1.min.js"></script>
+		<script src="scripts/d3-timer.v1.min.js"></script>
+		<script src="scripts/d3-force.v2.min.js"></script>
+		<script>
+		  window['d3-force'] = d3
+		</script>
+		<script src="scripts/cytoscape-d3-force.js"></script>
+		
+		<style>
+			@page{
+				size: landscape;
+			}
+			@media print
+			{   
+				.ehiv,.cy-panzoom
+				{
+					display: none !important;
+				}
+				#cy1
+				{
+					border:0px !important;
+				}
+			}
+			body {
+				font-family: helvetica;
+				font-size: 14px;
+			}
+			html, body {
+			  height: 100%;
+			}
+
+			.full-height {
+			  height: 100%;
+			  border: 1px solid rgba(0,0,0,.125);
+			  border-radius: .25rem;
+			}
+			.row{
+			  margin-bottom: 5px;	
+			}
+			#cy {
+			  height: 620px;
+			  margin:10px;
+			  z-index:1;
+			  border: 1px solid rgba(0,0,0,.125);
+			  border-radius: .25rem;
+			}
+			.tippy-popper
+			{
+				transition: none !important;
+			}
+
+			h1 {
+				/*opacity: 0.5;*/
+				font-size: 1.8em;
+				margin:10px;
+				padding-bottom:5px;
+				font-weight: bold;
+			}
+			h6 {
+				/*opacity: 0.5;*/
+				font-size: 1.7em;
+				margin-left:25px;
+				font-weight: bold;
+			}
+			.container{
+				margin: 0 !important;
+				max-width: 100% !important;
+				height: auto;
+				width: 100%;
+			}
+			.card-header {
+			padding: .5rem 1rem !important;
+			}
+			@media (min-width: 1200px)
+			.container, .container-lg, .container-md, .container-sm, .container-xl {
+				max-width: 100% !important;
+			}
+			.card {
+				position: relative;
+				display: -ms-flexbox;
+				display: flex;
+				-ms-flex-direction: column;
+				flex-direction: column;
+				min-width: 0;
+				word-wrap: break-word;
+				background-color: #fff;
+				background-clip: border-box;
+				border: 1px solid rgba(0,0,0,.125);
+				border-radius: .25rem;
+				margin-bottom:5px;
+			}
+			/*.col, .col-1, .col-10, .col-11, .col-12, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-auto, .col-lg, .col-lg-1, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-auto, .col-md, .col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-auto, .col-sm, .col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-auto, .col-xl, .col-xl-1, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-auto
+			{
+				position: relative;
+				padding-right: 0px !important;
+				padding-left: 0px !important;
+				margin: 10px !important;
+			}	*/
+			/*legend*/
+			.circleNeg {
+				border-radius: 50%;
+				behavior: url(PIE.htc); /* remove if you don't care about IE8 */
+				width: 30px;
+				height: 30px;
+				background: #999;
+				//border: 3px solid red;
+				margin-left:15px;
+			}
+			#popup{
+				position: absolute;
+				z-index:100;
+				top:0;
+				right:0;
+				background-color:#F7F7F7;
+				opacity: 0.5;
+			}
+			.ptnode{
+				background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAT0lEQVQoU4XQ0RIAEAhE0dv/f3SGqSYRHs3RrgRQQHgcBXXQYkOSJx3Y0QyrkYEzusF5p6a3IccnUvEelritc7yqnWxbgRdskG92YfmgwANsXxwIPJv9SQAAAABJRU5ErkJggg==) repeat;
+			}
+		</style>
+			
+		</head>
+
+		<body>
+			<div class="container">
+				<div class="row">
+					<div class="col-sm-6">
+					<h1><img src="img/icon.png" style="width:64px;">PDI+ Peer Referral Network Analysis Tool</h1>
+					</div>
+					<div class="col-sm-6 align-self-center text-right">
+						<img src="img/logo.png" style="height:36px;">
+					</div>
+				</div>
+				<div class="row ehiv">
+					<div class="col-sm-4">
+						<div class="custom-file">
+							<input type="file" class="custom-file-input" id="fileUpload" aria-describedby="inputGroupFileAddon01">
+							<label class="custom-file-label" for="fileUpload">Choose Excel file</label>
+  					    </div>
+					</div>
+					<div class="col-sm-8">
+						<button type="button" class="btn btn-primary" id="upload" value="Generate"><span class="fa fa-cogs"></span> Generate</button>
+						<button type="button" class="btn btn-secondary" id="btnprint" onclick="printout()"><span class="fa fa-print"></span> Print Preview</button>
+						<!--<button id="clickMe" class="btn btn-info"><span class="fa fa-arrow-circle-down"></span> Download</button> -->
+						<!--<a id="png-eg"  download="pdi.png">Download Image</a>-->
+					</div>
+				</div>
+				<div class="row">
+				  <div class="col-sm-10">
+					<div id="cy1" class="full-height">
+					<div id="popup" class="ehiv"></div>
+					</div>
+				  </div>
+				  <div class="col-sm-2">
+					<div class="card">
+						  <div class="card-header">
+							Feature
+						  </div>
+						  <div class="card-body">
+							<!--<h5 class="card-title">Special title treatment</h5>-->
+							<p class="card-text" id="nodenum">Total Node:</p>
+							<p class="card-text" id="nodeseed">Total Seed:</p>
+							<p class="card-text" id="nodefew">FEW Node:</p>
+							<p class="card-text" id="nodemsm">MSM Node:</p>
+							<p class="card-text" id="nodetg">TG Node:</p>
+							<!--<a href="#" class="btn btn-primary">Find Coupon</a>-->
+						  </div>
+					</div>
+					<div class="card">
+						  <div class="card-header">
+							Legend
+						  </div>
+						  <div class="card-body">
+							<div id="lseed">
+								<div><i class="fa fa-square" aria-hidden="true" style="color:#114791"></i> Seed</div>
+							</div>	
+							<div id="lfew">
+								<div><i class="fa fa-star" aria-hidden="true" style="color:#999"></i> FEW (HIV-)</div>
+								<div><i class="fa fa-star" aria-hidden="true" style="color:red"></i> FEW (HIV+)</div>
+								<div><i class="fa fa-star" aria-hidden="true" style="color:#8B0000"></i> FEW (Syp+)</div>
+								<div><i class="fa fa-star" aria-hidden="true" style="color:#a305c6"></i> FEW (HIV+,Syp+)</div>
+								<div style="margin:2px;"></div>
+							</div>
+							<div id="lmsm">
+								<div><i class="fa fa-square" aria-hidden="true" style="color:#999"></i> MSM (HIV-)</div>
+								<div><i class="fa fa-square" aria-hidden="true" style="color:red"></i> MSM (HIV+)</div>
+								<div><i class="fa fa-square" aria-hidden="true" style="color:#8B0000"></i> MSM (Syp+)</div>
+								<div><i class="fa fa-square" aria-hidden="true" style="color:a305c6"></i> MSM (HIV+,Syp+)</div>
+								<div style="margin:2px;"></div>
+							</div>
+							<div id="ltg">
+								<div><i class="fa fa-circle" aria-hidden="true" style="color:#999"></i> TG (HIV-)</div>
+								<div><i class="fa fa-circle" aria-hidden="true" style="color:red"></i> TG (HIV+)</div>
+								<div><i class="fa fa-circle" aria-hidden="true" style="color:#8B0000"></i> TG (Syp+)</div>
+								<div><i class="fa fa-circle" aria-hidden="true" style="color:#a305c6"></i> TG (HIV+,Syp+)</div>
+							</div>
+							<!--<a href="#" class="btn btn-primary">Find Coupon</a>-->
+						  </div>
+					</div>
+				  </div>
+				</div>
+			</div>
+		</body>
+
+<script>
+/////////////////////////////////////////////////////////////////////////
+	var dataArr;
+	var cy=cytoscape();
+	var dataSeed={};
+	var dataChild={};
+	var element={};
+	var edge={};
+	var nodeArray = [];
+	var nodeSeed=[];
+	var nodeew=[];
+	var nodeewp=[];
+	var nodemsm=[];
+	var nodemsmp=[];
+	var nodetg=[];
+	var nodetgp=[];
+	var edgeArray = [];
+	var seeds = [];
+	var exist = false;
+	$("#png-eg").css( "display", "none" );
+	$("#clickMe").attr("disabled", true);
+	$("#btnprint").attr("disabled", true);
+	function printout(){
+		window.print();
+	}
+	
+	$("#clickMe").click(function () {
+		//$("#png-eg").css( "display", "block" );
+		//var pnglink=document.creat
+		var png64 = cy.png({
+						  format: 'blob', // one of 'base64', 'base64uri', 'blob'
+						  quality:100
+						});
+		//$('#png-eg').attr('href',png64);
+		
+		var link = document.createElement('a');
+        document.body.appendChild(link);
+        link.download = 'pdi.png';
+        link.href = png64;
+        link.click();	
+	});
+	
+	$("body").on("click", "#upload", function ()
+	{
+	console.log(":::::::::"+$("#upload").val()+"::::::");
+	console.log(":::::::"+$.trim($("#fileUpload").val()));
+		
+	if($("#upload").val()=="Generate" && $.trim($("#fileUpload").val()) !="")
+	{
+		console.log("inside::::");
+		$("#upload").html("<span class='fa fa-refresh'></span> Refresh");
+		$("#upload").prop("value", "Refresh");
+		$("#clickMe").attr("disabled", false);
+		$("#btnprint").attr("disabled", false);
+		$("#fileUpload").attr("disabled", true);
+		//Reference the FileUpload element.
+		var fileUpload = $("#fileUpload")[0];
+		//Validate whether File is valid Excel file.
+		var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xls|.xlsx)$/;
+		if (regex.test(fileUpload.value.toLowerCase())) {
+			if (typeof (FileReader) != "undefined") {
+				var reader = null;
+				reader = new FileReader();
+ 
+				//For Browsers other than IE.
+				if (reader.readAsBinaryString) {
+					reader.onload = function (e) {
+						ProcessExcel(e.target.result);
+					};
+					reader.readAsBinaryString(fileUpload.files[0]);
+				} else {
+					//For IE Browser.
+					reader.onload = function (e) {
+						var data = "";
+						var bytes = new Uint8Array(e.target.result);
+						for (var i = 0; i < bytes.byteLength; i++) {
+							data += String.fromCharCode(bytes[i]);
+						}
+						ProcessExcel(data);
+					};
+					reader.readAsArrayBuffer(fileUpload.files[0]);
+					$("#fileUpload").val(null);
+				}
+			} else {
+				alert("This browser does not support HTML5.");
+			}
+		} else {
+			alert("Please upload a valid Excel file.");
+		}
+	}else if($.trim($("#fileUpload").val()) =="")
+	{
+		$("#clickMe").attr("disabled", true);
+		$("#btnprint").attr("disabled", true);
+		$("#fileUpload").attr("disabled", false);
+		alert("Please upload a valid Excel file.");
+	}
+	else{
+		$("#clickMe").attr("disabled", true);
+		$("#btnprint").attr("disabled", true);
+		$("#fileUpload").attr("disabled", false);
+		$("#upload").html("<span class='fa fa-cogs'></span> Generate");
+		$("#upload").prop("value", "Generate");
+		location.reload(true);
+	}		
+	});
+	//Declar cytoscape object
+	var cy;
+	
+	function ProcessExcel(data)
+	{
+		//$("#upload").attr("disabled", true);
+		//$("#clickMe").attr("disabled", true);
+		//$("#btnprint").attr("disabled", true);
+		//$("#upload").css('cursor', 'not-allowed');
+		
+		cy=cytoscape({layout: 
+			{
+				name: 'd3-force',
+				boundingBox: undefined,
+				xStrength: 0.1, // sets the strength accessor to the specified number or function
+				xX: 0, // sets the x-coordinate accessor to the specified number or function
+				yStrength: 0.1, // sets the strength accessor to the specified number or function
+				yY: 0
+			}});
+		//$("#upload").attr("disabled", true);
+		//$("#upload").css('cursor', 'not-allowed');
+		//$("#fileUpload").attr("disabled", true);
+	    //Reset
+		//cy=cytoscape({});
+		dataChild={};
+		dataSeed={};
+		edge={};
+		element={};
+		nodeArray = [];
+		nodeSeed=[];
+		nodeew=[];
+		nodeewp=[];
+		nodemsm=[];
+		nodemsmp=[];
+		nodetg=[];
+		nodetgp=[];
+		edgeArray = [];
+		seeds = [];
+		exist = false;
+		
+		//cy.$('#cy1').css({'content' : ''})
+		//cy.stop();
+		//cy.reset();
+	
+		//Read the Excel File data.
+		var workbook = null;
+		workbook = XLSX.read(data, {
+			type: 'binary'
+		});
+ 
+		//Fetch the name of First Sheet.
+		var firstSheet = null;
+		firstSheet = workbook.SheetNames[0];
+ 
+		//Read all rows from First Sheet into an JSON array.
+		var excelRows = null;
+		excelRows = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[firstSheet]);
+		
+		$("#lfew").css( "display", "none" );
+		$("#lmsm").css( "display", "none" );
+		$("#ltg").css( "display", "none" );
+		
+		$("#nodefew").css( "display", "none" );
+		$("#nodemsm").css( "display", "none" );
+		$("#nodetg").css( "display", "none" );
+		
+		//console.log("num_row:::"+excelRows.length);
+		for (var i = 0; i < excelRows.length; i++)
+		{
+			exist = false;
+			
+			//legend
+			if(excelRows[i].kp=="FEW")
+			{
+				$("#lfew").css( "display", "block" );
+				$("#nodefew").css( "display", "block" );
+			}else if(excelRows[i].kp=="MSM")
+			{
+				$("#lmsm").css( "display", "block" );
+				$("#nodemsm").css( "display", "block" );
+			}else if(excelRows[i].kp=="TG")
+			{
+				$("#ltg").css( "display", "block" );
+				$("#nodetg").css( "display", "block" );
+			}
+			
+		   //filter duplicate
+			var fd=nodeArray.findIndex(obj => obj.data.id==excelRows[i].seed_id);
+			if (fd>=0)
+			{
+				exist = true;
+				//break;
+			}
+			//console.log("CHECK::::"+excelRows[i].coupon_id_participant);
+			if(excelRows[i].seed_id!=undefined)
+			{
+				if (!exist)
+				{
+					//var dataSeed={};
+					dataSeed =
+						{  
+							data:{
+									id:excelRows[i].seed_id,
+									group:excelRows[i].kp,
+									type:"seed",
+									hiv_date:excelRows[i].hts_date,
+									hiv_result:excelRows[i].hiv_result,
+									syp_result:excelRows[i].syphilis_result,
+									label:excelRows[i].seed_id
+								 }
+							//id:excelRows[i].seed_id ,
+							//group:'nodes',	 
+							//label:excelRows[i].seed_id,
+							//type:excelRows[i].kp,
+							//hiv_result:excelRows[i].hiv_result,
+							//syp_result:excelRows[i].syphilis_result
+						};
+					   
+				   nodeArray.push (dataSeed);
+				   nodeSeed.push(dataSeed);
+				   //console.log("CHECK FIND::::"+nodeSeed.find(item => item.id === '316500'));
+				   
+				 }
+				   
+				//var dataChild ={};
+				dataChild =
+						{  
+							data:{
+									id:excelRows[i].coupon_id_participant,
+									group:excelRows[i].kp,
+									type:"child",
+									hiv_date:excelRows[i].hts_date,
+									hiv_result:excelRows[i].hiv_result,
+									syp_result:excelRows[i].syphilis_result,
+									label:excelRows[i].coupon_id_participant
+								 }
+						};
+				
+				
+				nodeArray.push (dataChild);
+				if(excelRows[i].kp=="FEW")
+				{
+					nodeew.push(dataChild);
+					if(excelRows[i].hiv_result=="Reactive")
+					{
+						nodeewp.push(dataChild);
+					}
+				}
+				else if(excelRows[i].kp=="MSM")
+				{
+					nodemsm.push(dataChild);
+					if(excelRows[i].hiv_result=="Reactive")
+					{
+						nodemsmp.push(dataChild);
+					}
+				}
+				else
+				{
+					nodetg.push(dataChild);
+					//console.log("TG:::"+excelRows[i].hiv_result);
+					if(excelRows[i].hiv_result=="Reactive")
+					{
+						nodetgp.push(dataChild);
+						//console.log("Got TG:::"+excelRows[i].hiv_result+nodetgp.length);
+					}
+				}
+			}	
+			
+			if ( excelRows[i].coupon_id_participant != excelRows[i].seed_id && excelRows[i].coupon_id_participant!=undefined)
+			{
+			
+					edge = 
+						{
+							data: 
+								{	
+									source: excelRows[i].seed_id ,
+									target: excelRows[i].coupon_id_participant,
+									id:excelRows[i].seed_id+"-"+excelRows[i].coupon_id_participant,
+									group:excelRows[i].kp,
+									time:excelRows[i].coupon_distributed,
+									label:excelRows[i].seed_id+"-"+excelRows[i].coupon_id_participant,
+									name:excelRows[i].seed_id+"-"+excelRows[i].coupon_id_participant
+								}
+					   };
+					
+					edgeArray.push(edge);
+			}
+			
+			//console.log(i+"Seed:::"+nodeSeed.length);
+			//console.log(i+"Node:::"+nodeArray.length);
+		   
+		}
+		element=nodeArray.concat(edgeArray);
+		//var element = {nodes:nodeArray, edges: edgeArray};
+		
+		$("#nodeseed").html("Total Seed: "+nodeSeed.length);
+		$("#nodenum").html("Total Node: "+nodeArray.length);
+		
+		$("#nodefew").html("FEW (HIV+): "+nodeewp.length+" of "+nodeew.length);
+		$("#nodemsm").html("MSM (HIV+): "+nodemsmp.length+" of "+nodemsm.length);
+		$("#nodetg").html("TG (HIV+): "+nodetgp.length+" of "+nodetg.length);
+		
+		//console.log("Completed run::::"+JSON.stringify(element));
+		//console.log("Completed running:::");
+		
+		////////////////Cytoscape///////
+		//var cy = window.cy = cytoscape(
+		cy = cytoscape(
+		{
+			container: document.getElementById('cy1'),
+			// demo your layout
+			layout: 
+			{
+				name: 'd3-force',
+				//fit:'autoFitRoom',
+				//headless: false,
+				//boundingBox: { x1: 0, y1: 0, w: 1000, h: 1000 },
+				boundingBox: undefined,
+				//width: 1000,
+				//height: 1000,
+				xStrength: 0.1, // sets the strength accessor to the specified number or function
+				xX: 0, // sets the x-coordinate accessor to the specified number or function
+				yStrength: 0.1, // sets the strength accessor to the specified number or function
+				yY: 0, // sets the y-coordinate accessor to the specified number or function
+				manyBodyDistanceMin: 1,
+				animate: true,
+				animationThreshold: 250,
+				animationDuration: 10,
+				fixedAfterDragging: true,
+				autoungrabify:true,
+				gravity: 1,
+				fit:false,
+				//style:'roomStyle',
+				avoidOverlap: true,
+				linkId: function id(d)
+				{
+				  return d.id;
+				},
+				linkDistance: 80,
+				manyBodyStrength: -350,
+				ready: function(){
+					console.log("cy ready new instance:::::");
+					cy.center();
+					cy.stop();
+					cy.nodes().stop();
+					//cy.progress(0).apply();
+					//cy.viewport();
+					//cy.render();
+					///cy.fit();
+					//$("#upload").attr("disabled", true);
+					//$("#clickMe").attr("disabled", true);
+					//$("#btnprint").attr("disabled", true);
+					//$("#upload").css('cursor', 'not-allowed');
+					//cy.zoomingEnabled( false );
+					//cy.boxSelectionEnabled( false ); 
+					},
+				stop: function(){
+					cy.stop();
+					//cy.progress(0).apply();
+					//cy.reset();
+					//cy.render();
+					cy.nodes().stop();
+					console.log("cy stop running:::::");
+					//$("#upload").attr("disabled", false);
+					//$("#clickMe").attr("disabled", false);
+					//$("#btnprint").attr("disabled", false);
+					//$("#upload").css('cursor', 'pointer');
+					//cy.zoomingEnabled( true );
+					//cy.boxSelectionEnabled( true );
+				},
+				tick: function(progress)
+				{
+				  //console.log('progress - ', progress);
+				},
+				randomize: true,
+				infinite: true
+				// some more options here...
+			},
+
+			style:
+			[
+				{
+					selector: 'node',
+					style: {
+						'content': 'data(name)',
+						'label': 'data(id)'
+					}
+				},
+				{
+					selector: 'node[group="FEW"][type="seed"]',
+					css: {
+					'text-valign': 'center',
+					'text-halign': 'center',
+					'shape':'star',
+					'height': '40px',
+					'width': '40px',
+					'font-size':'12px',
+					'color': 'white',
+					'background-color': '#114791',
+					'label': 'data(id)'
+					}
+				},
+				{
+					selector: 'node[group="MSM"][type="seed"]',
+					css: {
+					'text-valign': 'center',
+					'text-halign': 'center',
+					'font-size':'12px',
+					'shape':'rectangle',
+					'height': '40px',
+					'width': '40px',
+					'color': 'white',
+					'background-color': '#114791',
+					'label': 'data(id)'
+					}
+				},
+				{
+					selector: 'node[group="TG"][type="seed"]',
+					css: {
+					'text-valign': 'center',
+					'text-halign': 'center',
+					//'shape':'rectangle',
+					'height': '40px',
+					'width': '40px',
+					'font-size':'12px',
+					'color': 'white',
+					'background-color': '#114791',
+					'label': 'data(id)'
+					}
+				},
+				{
+					selector: 'node[group="FEW"][type="child"][hiv_result="Negative"][syp_result="Negative"]',
+					style: {
+						'label': 'data(label)',
+						'shape':'star',
+						'text-valign': 'center',
+						'text-halign': 'center',
+						'color': 'white',
+						'font-size':'9px',
+						'background-color': '#999'
+					}
+				},
+				{
+					selector: 'node[group="FEW"][type="child"][hiv_result="Reactive"][syp_result="Negative"]',
+					style: {
+						'label': 'data(label)',
+						'shape':'star',
+						'text-valign': 'center',
+						'text-halign': 'center',
+						'color': 'white',
+						'font-size':'9px',
+						'background-color': 'red'
+					}
+				},
+				{
+					selector: 'node[group="FEW"][type="child"][hiv_result="Negative"][syp_result="Reactive"]',
+					style: {
+						'label': 'data(label)',
+						'shape':'star',
+						'text-valign': 'center',
+						'text-halign': 'center',
+						'color': 'white',
+						'font-size':'9px',
+						'background-color': '#8B0000'
+					}
+				},
+				{
+					selector: 'node[group="FEW"][type="child"][hiv_result="Reactive"][syp_result="Reactive"]',
+					style: {
+						'label': 'data(label)',
+						'shape':'star',
+						'text-valign': 'center',
+						'text-halign': 'center',
+						'color': 'white',
+						'font-size':'9px',
+						'background-color': '#a305c6'
+					}
+				},
+				{
+					selector: 'node[group="MSM"][type="child"][hiv_result="Negative"][syp_result="Negative"]',
+					style: {
+						'label': 'data(label)',
+						'shape':'rectangle',
+						'text-valign': 'center',
+						'text-halign': 'center',
+						'color': 'white',
+						'font-size':'9px',
+						'background-color': '#999'
+					}
+				},
+				{
+					selector: 'node[group="MSM"][type="child"][hiv_result="Reactive"][syp_result="Negative"]',
+					style: {
+						'label': 'data(label)',
+						'shape':'rectangle',
+						'text-valign': 'center',
+						'text-halign': 'center',
+						'color': 'white',
+						'font-size':'9px',
+						'background-color': 'red'
+					}
+				},
+				{
+					selector: 'node[group="MSM"][type="child"][hiv_result="Negative"][syp_result="Reactive"]',
+					style: {
+						'label': 'data(label)',
+						'shape':'rectangle',
+						'text-valign': 'center',
+						'text-halign': 'center',
+						'color': 'white',
+						'font-size':'9px',
+						'background-color': '#8B0000'
+					}
+				},
+				{
+					selector: 'node[group="MSM"][type="child"][hiv_result="Reactive"][syp_result="Reactive"]',
+					style: {
+						'label': 'data(label)',
+						'shape':'rectangle',
+						'text-valign': 'center',
+						'text-halign': 'center',
+						'color': 'white',
+						'font-size':'9px',
+						'background-color': '#a305c6'
+					}
+				},
+				{
+					selector: 'node[group="TG"][type="child"][hiv_result="Negative"][syp_result="Negative"]',
+					style: {
+						'label': 'data(label)',
+						'text-valign': 'center',
+						'text-halign': 'center',
+						'color': 'white',
+						'font-size':'9px',
+						'background-color': '#999'
+					}
+				},
+				{
+					selector: 'node[group="TG"][type="child"][hiv_result="Reactive"][syp_result="Negative"]',
+					style: {
+						'label': 'data(label)',
+						'text-valign': 'center',
+						'text-halign': 'center',
+						'color': 'white',
+						'font-size':'9px',
+						'background-color': 'red'
+					}
+				},
+				{
+					selector: 'node[group="TG"][type="child"][hiv_result="Negative"][syp_result="Reactive"]',
+					style: {
+						'label': 'data(label)',
+						'text-valign': 'center',
+						'text-halign': 'center',
+						'color': 'white',
+						'font-size':'9px',
+						'background-color': '#8B0000'
+					}
+				},
+				{
+					selector: 'node[group="TG"][type="child"][hiv_result="Reactive"][syp_result="Reactive"]',
+					style: {
+						'label': 'data(label)',
+						'text-valign': 'center',
+						'text-halign': 'center',
+						'color': 'white',
+						'font-size':'9px',
+						'background-color': '#a305c6'
+					}
+				},
+				{
+					selector: 'edge',
+					style: {
+						'curve-style': 'bezier',
+						'target-arrow-shape': 'triangle'
+					}
+				},
+				{
+					selector: 'node:selected',
+					style: {
+					  'border-color': 'yellow',
+					  'border-width': 5
+					}
+				}
+			],
+		  //elements: createData(100),
+		  elements:element,
+		  wheelSensitivity: 0.1,
+		});
+		
+		//cy.run();
+		//cy.notify( {
+		//  eles: this,
+		//  type: 'draw'
+		//} );
+		//Unable move node
+		//cy.nodes().ungrabify();
+		cy.on('drag',function(d){
+			console.log("Drag:::::::::::::");
+			cy.stop();
+			cy.nodes().stop();
+		});
+		cy.on('free',function(e){
+			console.log("Free:::::::::::::");
+			cy.stop();
+			cy.nodes().stop();
+		});
+		cy.on('grab',function(e){
+			console.log("Grab:::::::::::::");
+			cy.stop();
+			cy.nodes().stop();
+		});
+		cy.on('render',function(e){
+			cy.stop();
+			cy.nodes().stop();
+			//cy.render();
+			console.log("Render::::::"+e);
+			//cy.reset();
+			//cy.headless(true);
+			//  cy.nodes().layout({
+			//	name: 'd3-force',
+			//	animate: false
+				//fit: false
+			//}).run();
+		});
+		cy.on('destroy', function (e) {
+			console.log("Destroy::::::");
+			cy.reset();
+			cy.removeData();
+			cy.$('#cy1').css({'content':''});
+			cy.collection();
+			cy.destroy();
+			delete cy;
+			
+		});
+		
+		//cy.on('ready',function(){
+			//var bounds = cy.elements().boundingBox();
+			//$('#cy1').css('height', bounds.h + 300);
+			//cy.center();
+			//cy.resize();
+			//$('#cy').cytoscapeEdgehandles('resize');
+			//var png64=cy.png({'full':true});
+			//var png64=cy.png();
+			//$('#imgnode').attr('src', png64);
+			//cy.removeData();
+			//cy.stop();
+			//cy.reset();
+		//});
+		cy.panzoom({
+			// options here...
+			//$("#cy1").css('cursor', 'pointer');
+		});
+		cy.on('mouseover', 'node', function (evt) {                            
+				//$('html,body').css('cursor', 'pointer');
+				var node = evt.target;
+				//console.log( 'mouse on ID:' + node.data('label')+", HIV Result:"+node.data('hiv_result') );
+				$("#popup").html("Node:"+node.data('label')+"<br/>"+"HIV Test Date:"+node.data('hiv_date')+"<br/>"+"HIV Result:"+node.data('hiv_result')+"<br/>"+"Syphilis Result:"+node.data('syp_result'));
+			} );
+		
+		cy.on('mouseout', 'node', function(e){
+			$("#popup").html();
+		});
+	};
+</script>
+</html>

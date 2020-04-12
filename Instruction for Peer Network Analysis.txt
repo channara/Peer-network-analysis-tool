@@ -1,0 +1,25 @@
+
+Instruction for peer network analysis tool: (offline)
+1-Copy Peer Network Analysis of PD+, then Unzip Folder. After unzip, you will see five folders and two files as below: Please do not delete those file or folders.
+	a.Css, 
+	b.example-file
+	c.font-awesome-4.0.3
+	d.img
+	e.scripts
+	f.index.html
+	g.instruction guide
+2-Before start generating a network, you should clean up data (PDI+ form) which provided by your NGO as standardize form called PDI+ tracking form (example SEED000001, SEED000002)
+3-Copy data which you have clean up and past over example-file data (the same variable name)
+
+4-Open folder Peer Network Analysis
+	a.Double click index.html to open
+	b.Click browse
+	c.Select example file
+	d.OK
+5-Please see label on the right 
+	a.Number of SEED
+	b.number of participants
+	c.Number of HIV+
+	d.Number of Syphilis +
+	f.Sharp which represents to KPs (MSM, TG, EW, PWID)
+ 
